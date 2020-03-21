@@ -1,5 +1,6 @@
 package Calc.Factory;
 
+import Calc.General.Main;
 import Calc.General.UniversalCommand;
 
 import java.io.InputStream;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class BlockFactory
 {
@@ -23,7 +25,8 @@ public class BlockFactory
         }
         catch (IOException e)
         {
-            System.out.println("Factory: Problem in reading configuration file");
+            Main.logger.log(Level.WARNING, "Factory: Problem in reading configuration file");
+            //System.out.println("Factory: Problem in reading configuration file");
         }
 
         for (String key : prop.stringPropertyNames())
@@ -37,7 +40,8 @@ public class BlockFactory
             }
             catch (Exception e)
             {
-                System.out.println("Factory: Problem with loading class " + key );
+                Main.logger.log(Level.WARNING, "Factory: Problem with loading class " + key);
+                //System.out.println("Factory: Problem with loading class " + key );
             }
         }
     }
