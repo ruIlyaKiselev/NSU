@@ -6,23 +6,35 @@
 
 int ReadFile(int* descriptor, int* stringLengthTable, int* stringPositionTable)
 {
-    int iterator = 0;
+    int lengthIterator = 0;
+    int positionIterator = 0;
     int counter = 0;
-    char tmp;
+    int bufferSize = 0;
+    char buffer[ARRAY_SIZE];
 
-    while(read(*descriptor, &tmp, 1))
+    while(bufferSize = read(*descriptor, buffer, ARRAY_SIZE))
     {
-        if (tmp == '\n')
+        if (bufferSize < 0)
         {
-            iterator++;
-            stringLengthTable[counter] = iterator;
-            counter++;
-            stringPositionTable[counter] = lseek(*descriptor, 0, SEEK_CUR);
-            iterator = 0;
+            break;
         }
-        else
+
+        for (int i = 0; i != bufferSize; ++i)
         {
-            iterator++;
+            if (buffer[i] == '\n')
+            {
+                lengthIterator++;
+                positionIterator++;
+                stringLengthTable[counter] = lengthIterator;
+                counter++;
+                stringPositionTable[counter] = positionIterator;
+                lengthIterator = 0;
+            }
+            else
+            {
+                lengthIterator++;
+                positionIterator++;
+            }
         }
     }
 
@@ -37,7 +49,13 @@ int FindString(int* descriptor, int* stringLengthTable, int* stringPositionTable
     while(1)
     {
         printf("Select string by number: ");
-        scanf("%d",&number);
+
+        if (scanf("%d",&number) != 1)
+        {
+            printf("Incorrect string number. Next time enter a number from 1 to %d.\n", totalQuantityOfStrings);
+            fflush(stdin);
+            continue;
+        }
 
         if(number == 0)
         {
@@ -47,7 +65,7 @@ int FindString(int* descriptor, int* stringLengthTable, int* stringPositionTable
         if(number < 0 || number > totalQuantityOfStrings)
         {
             printf("Incorrect string number. Next time enter a number from 1 to %d.\n", totalQuantityOfStrings);
-            return -1;
+            continue;
         }
 
         lseek(*descriptor, stringPositionTable[number - 1], SEEK_SET);
@@ -59,6 +77,7 @@ int FindString(int* descriptor, int* stringLengthTable, int* stringPositionTable
         else
         {
             printf("Cannot find line with such number.\n");
+            continue;
         }
     }
 
@@ -101,12 +120,5 @@ int main(int argc, char **argv)
 
     close((descriptor));
 
-    if (result == 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return -1;
-    }
+    return 0;
 }
