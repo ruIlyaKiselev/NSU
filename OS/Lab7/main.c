@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
+#include <malloc.h>
+#include <err.h>
+#include <string.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/time.h>
 
 #define ARRAY_SIZE 4096
 
@@ -46,11 +50,31 @@ int FindString(int* descriptor, int* stringLengthTable, int* stringPositionTable
     int number;
     char* buffer = NULL;
 
+    struct timeval tmo;
+    fd_set readfds;
+
     while(1)
     {
-        printf("Select string by number: ");
+        printf("You have five seconds to select string by number: ");
 
-        if (scanf("%d", &number) != 1)
+        fflush(stdout);
+
+        FD_ZERO(&readfds);
+        FD_SET(0, &readfds);
+        tmo.tv_sec = 5;
+        tmo.tv_usec = 0;
+
+        switch (select(1, &readfds, NULL, NULL, &tmo))
+        {
+            case -1:
+                err(1, "select");
+                break;
+            case 0:
+                printf("\nYou don't give input\n");
+                return (1);
+        }
+
+        if (scanf("%d",&number) != 1)
         {
             printf("Incorrect string number. Next time enter a number from 1 to %d.\n", totalQuantityOfStrings);
             fflush(stdin);
@@ -72,10 +96,14 @@ int FindString(int* descriptor, int* stringLengthTable, int* stringPositionTable
 
         if (buffer != NULL)
         {
-            for (int i = stringPositionTable[number - 1]; i != stringPositionTable[number - 1] + stringLengthTable[number - 1]; ++i)
+            char* result = (char*)malloc((stringPositionTable[number - 1] + stringLengthTable[number - 1] + 1) * sizeof(char*));
+            for (int i = stringPositionTable[number - 1], j = 0; i != stringPositionTable[number - 1] + stringLengthTable[number - 1]; ++i, ++j)
             {
-                putchar(buffer[i]);
+                result[j] = buffer[i];
             }
+
+            printf("%s", result);
+            free(result);
         }
     }
 
