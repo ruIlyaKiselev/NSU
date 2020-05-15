@@ -6,12 +6,6 @@
 
 int main(int argc, char* argv[])
 {
-    if (argc < 3)
-    {
-        printf("Bad program arguments. You should enter something like ./<FileName> <TextFileName>\n");
-        exit(1);
-    }
-
     printf("main: argc = %d\n      argv = { ", argc);
     for(int i = 0; i != argc; ++i)
     {
@@ -32,7 +26,7 @@ int main(int argc, char* argv[])
 
     if (pid == 0) //if I am a child process
     {
-        if (execv(argv[1], argv + 2) == -1)
+        if (execv(argv[1], argv + 1) == -1)
         {
             perror("Error execl");
             exit(3);
@@ -43,7 +37,8 @@ int main(int argc, char* argv[])
     {
         wait(&status);
         printf("Return status: %d\n", WEXITSTATUS(status));
+        return WEXITSTATUS(status);
     }
 
-    exit(0);
+    return 0;
 }

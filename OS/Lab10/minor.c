@@ -14,10 +14,10 @@ int main(int argc, char* argv[])
     }
     printf("}\n");
 
-    if (argc != 0)
+    if (argc > 1)
     {
-        printf("Minor program: success with %s!\n", argv[0]);
-        return atoi(argv[0]);
+        printf("Minor program: success with %s!\n", argv[1]);
+        return atoi(argv[1]);
     }
 
     printf("Minor program: fail!\n");
