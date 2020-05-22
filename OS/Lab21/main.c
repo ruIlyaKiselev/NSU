@@ -1,8 +1,10 @@
-
 #include <stdio.h>
 #include <signal.h>
 #include <termios.h>
 #include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 size_t soundCounter = 0;
 
@@ -10,7 +12,7 @@ void handlerSIGINT(int sig)
 {
     if (sig == SIGINT)
     {
-        printf("\a"); // play sound
+        write(STDOUT_FILENO, "\a", 1); // play sound
         fflush(stdout);
         ++soundCounter;
     }
