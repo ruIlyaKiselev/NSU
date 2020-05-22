@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <signal.h>
 #include <termios.h>
@@ -26,10 +27,12 @@ void handlerSIGQUIT(int sig)
 
 int main()
 {
+    sigset(SIGINT, handlerSIGINT);
+    sigset(SIGQUIT, handlerSIGQUIT);
+
     while (1)
     {
-        signal(SIGINT, handlerSIGINT);
-        signal(SIGQUIT, handlerSIGQUIT);
+
     }
 
     return 0;
